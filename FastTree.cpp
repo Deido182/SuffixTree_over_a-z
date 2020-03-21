@@ -173,73 +173,8 @@ class SuffixTree {
 			return sa;
 		}
 };
-
-void findSmallestString(string s, int k, char *ans) {
-	int len = s.length();
-    ans[len] = '\0';
-    if(k == 0) {
-    	for(int i = 0; i < len; i ++)
-    		ans[i] = s[i];
-    	return;
-	}
-    string r = s;
-    reverse(r.begin(), r.end());
-    string sr = s + r;
-    SuffixTree *st = new SuffixTree(sr);
-    int *sa = st -> getSuffixArray();
-    int nextPos = 0;
-    for(int i = 0; i < (len << 1) && nextPos < len && k > 0; i ++) {
-        if(sa[i] >= len) {
-    		// segment reversed
-    		if(sa[i] - len > len - 1 - nextPos)
-    			continue;
-    		int end = len - nextPos;
-    		for(int j = sa[i] - len; j < end; j ++)
-    			ans[nextPos ++] = r[j];
-    		k --;
-    	} else if(sa[i] == nextPos) {
-    		ans[nextPos] = s[nextPos];
-    		nextPos ++;
-    	}
-    }
-    if(nextPos != len) {
-    	string e1 = s.substr(nextPos, len);
-    	string e2 = r.substr(0, len - nextPos);
-    	string end = (e1.compare(e2) <= 0 ? e1 : e2);
-    	for(int i = 0; i < len - nextPos; i ++)
-    		ans[nextPos + i] = end[i];
-    }
-    delete st;
-    delete[] sa;
-}
  
 int main(void) {
-	const int MAX_SIZE = (int)1e6 + 2;
-	const int MAX_SIZE_NAME = (int)1e2;;
-	int testCases, len;
-	long long start, end;
-	char s[MAX_SIZE];
-	char ans[MAX_SIZE];
-	char name[MAX_SIZE_NAME];
-	FILE *nameList = fopen("NameList.txt", "r");
-	FILE *results = fopen("FastTreeOutput/Results.txt", "w");
-	FILE *time = fopen("FastTreeOutput/Time.txt", "w");
-	fscanf(nameList, "%d", &testCases);
-	while(testCases -- > 0) {
-		fscanf(nameList, "%s", name);
-		FILE *testCase = fopen(name, "r");
-		fscanf(testCase, "%d%s", &len, s);
-		start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-		findSmallestString(s, len + 1, ans); // len + 1 means "divide s as many times you prefer"
-		end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-		fclose(testCase);
-		fprintf(results, "%s\n", ans);
-		fprintf(time, "%s: %d ms\n", name, end - start);
-		printf("%s DONE - remaining: %d\n", name, testCases);
-	}
-	fclose(nameList);
-	fclose(results);
-	fclose(time);
 	/*
 	// For the test over SPOJ
 	string s;
